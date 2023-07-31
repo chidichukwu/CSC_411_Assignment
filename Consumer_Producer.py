@@ -179,6 +179,27 @@ def parse_xml_data(xml_data):
       logging.error(f"Exception in parsing XML data: {e}")
       return None
 
+def calculate_average_mark(student):
+    try:
+         # Calculates the student's average mark by summing all their course marks and dividing by the number of courses they have enrolled for
+        average_mark = sum(student.marks) / len(student.marks)
+        student.average_mark = average_mark
+    except ZeroDivisionError:
+         #logs the error 
+         print("ZeroDivisionError: No marks found for the student")    
+
+
+def print_student_info(student):
+    #displays the student's information on the screen , this information includes the student's name, id, programme, courses they have enrolled for , the marks obtained for each enrolled course, average and finally their overall result
+    print(f"Name: {student.student_name}")
+    print(f"Student ID: {student.student_id}")
+    print(f"Programme: {student.programme}")
+    print("Courses and Marks:")
+    for i, course in enumerate(student.courses):
+                print(f"  {course}: {student.marks[i]}")
+    print(f"Average Mark: {student.average_mark}")
+    print(f"Pass/Fail: {'Pass' if student.average_mark >= 50 else 'Fail'}")
+    print()
 
 def delete_xml_file(file_name):
  # removes the generated xml files from the file system they are stored in using the os module
