@@ -15,7 +15,7 @@ buffer_empty = threading.Semaphore(BUFFER_SIZE)
 
 class ITStudent:
     def __init__(self, student_name, student_id, programme, courses, marks):
-        # Initialize the ITStudent object with the given student information
+        # InitializeS the ITStudent object with the given student information
         self.student_name = student_name
         self.student_id = student_id
         self.programme = programme
@@ -27,20 +27,20 @@ def handle_client(client_socket, address):
     #performs different operations based on the request, and sends back responses.
 
     while True:
-        # Receive the request from the client
+        # ReceiveS the request from the client
         request = client_socket.recv(5120).decode()
 
-        # Process the request based on its value
+        # Processes the request based on its value
         if request == "generate":
             try:
-                # Generate a random student and save it as an XML file
+                # Generates a random student and save it as an XML file
                 student = generate_random_student()
                 file_name = f"student{random.randint(1, 10)}.xml"
                 xml_data = generate_xml_data(student)
                 save_xml_file(file_name, xml_data)
                 client_socket.send(f"Student file: {file_name} has been generated successfully".encode())
                 
-                # Acquire the buffer lock and add the file name to the buffer
+                # Acquires the buffer lock and add the file name to the buffer
                 buffer_empty.acquire()
                 buffer_lock.acquire()
                 buffer.append(file_name)
@@ -53,23 +53,23 @@ def handle_client(client_socket, address):
 
         elif request == "process":
             try:
-                # Acquire the buffer lock and process the next file in the buffer
+                # Acquires the buffer lock and process the next file in the buffer
                 buffer_full.acquire()
                 buffer_lock.acquire()
                 file_name = buffer.pop(0)
                 buffer_lock.release()
                 buffer_empty.release()
 
-                 # Read the XML file, parse the data, and perform calculations
+                 # Reads the XML file, parse the data, and perform calculations
                 xml_data = read_xml_file(file_name)
                 student = parse_xml_data(xml_data)
                 calculate_average_mark(student)
                 info = get_student_info(student)
 
-                # Send the student information to the client
+                # Sends the student information to the client
                 client_socket.send(info.encode())
 
-                # Delete the XML file
+                # Deletes the XML file
                 delete_xml_file(file_name)
 
             except Exception as e:
@@ -83,41 +83,41 @@ def handle_client(client_socket, address):
     client_socket.close()
 
 def generate_random_student():
-    # Generate a random student name from a list of names
+    # Generates a random student name from a list of names
     student_name = ''.join(random.choice(['Parrish Kehlani','Kim Soo Hyun','Hero Fiennes Tiffin','Cole Sprouse','Ahn Hyo Seop','Kim Min Kyu','Micheal Behling','Corey Mylchreest','Daniel Ezra','Zade Meadows']))
-    # Generate a random student ID consisting of 9 digits
+    # Generates a random student ID consisting of 9 digits
     student_id = ''.join(random.choices(string.digits, k=9))
-    # Generate a random programme from a list of programmes
+    # Generates a random programme from a list of programmes
     programme = random.choice(['Computer Science', 'Information Technology', 'Software Engineering','Computer Engineering'])
-    # Generate a random list of courses from a list of course options
+    # Generates a random list of courses from a list of course options
     courses = random.choices(['Intergrative Programming', 'Computer Security', 'Database Design', 'Web Development','Entrepreneurship and Innovation','Information Technology','Data Mining'], k=5)
-    # Generate a random list of marks for the courses
+    # Generates a random list of marks for the courses
     marks = random.choices(range(0, 100),k=5)
-    # Create and return an ITStudent object with the generated student information
+    # Creates and returns an ITStudent object with the generated student information
     return ITStudent(student_name, student_id, programme, courses, marks)
     
 
 def generate_xml_data(student):
-    # Create the root element of the XML tree with the tag "Student"
+    # Creates the root element of the XML tree with the tag "Student"
     root = ET.Element("Student")
-    # Create sub-elements for the student's name, ID, and programme
+    # Creates sub-elements for the student's name, ID, and programme
     name_element = ET.SubElement(root, "Name")
     name_element.text = student.student_name
     id_element = ET.SubElement(root, "ID")
     id_element.text = student.student_id
     programme_element = ET.SubElement(root, "Programme")
     programme_element.text = student.programme
-    # Create a sub-element for the student's courses
+    # Creates a sub-element for the student's courses
     courses_element = ET.SubElement(root, "Courses")
     
     for i, course in enumerate(student.courses):
-        # Create a sub-element for each course
+        # Creates a sub-element for each course
         course_element = ET.SubElement(courses_element, "Course")
-        # Set the "name" attribute of the course element to the course name
+        # Sets the "name" attribute of the course element to the course name
         course_element.set("name", course)
-         # Create a sub-element for the mark of the course
+         # Creates a sub-element for the mark of the course
         mark_element = ET.SubElement(course_element, "Mark")
-        # Set the text of the mark element to the corresponding mark from the student's marks list
+        # Sets the text of the mark element to the corresponding mark from the student's marks list
         mark_element.text = str(student.marks[i])
 
     # Converts the XML tree to a string with the unicode encoding    
@@ -144,42 +144,42 @@ def read_xml_file(file_name):
 
 def parse_xml_data(xml_data):
     try: 
-        # Parse the XML data and get the root element
+        # Parses the XML data and get the root element
         root = ET.fromstring(xml_data)
 
-        # Extract student details from the XML
+        # Extracts student details from the XML
         student_name = root.find("Name").text
         student_id = root.find("ID").text
         programme = root.find("Programme").text
 
-        # Initialize empty lists for enrolled courses and enrolled course marks
+        # Initializes empty lists for enrolled courses and enrolled course marks
         courses = []
         marks = []
 
         for course_element in root.find("Courses"):
-            # Extract course name and mark from each course element
+            # Extracts course name and mark from each course element
             course_name = course_element.get("name")
             mark = int(course_element.find("Mark").text)
 
-            # Append course name and mark to the respective lists
+            # Appends course name and mark to the respective lists
             courses.append(course_name)
             marks.append(mark)
 
-        # Create a new ITStudent object with the extracted information
+        # Creates a new ITStudent object with the extracted information
         return ITStudent(student_name, student_id, programme, courses, marks)
     except Exception as e:
-      #Handle the specifc exception or log the error
+      #Handles the specifc exception or log the error
       logging.error(f"Exception in parsing XML data: {e}")
       return None
 
 
 def calculate_average_mark(student):
     try:
-         # Calculate the students average mark by summing all their course marks and dividing by the number of courses they have enrolled for
+         # Calculates the students average mark by summing all their course marks and dividing by the number of courses they have enrolled for
         average_mark = sum(student.marks) / len(student.marks)
         student.average_mark = average_mark
     except ZeroDivisionError:
-         #Handle the exception or log the error 
+         #Handles the exception or log the error 
          print("ZeroDivisionError: No marks found for the student")    
 
 def delete_xml_file(file_name):
