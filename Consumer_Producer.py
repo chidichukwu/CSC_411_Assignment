@@ -40,6 +40,7 @@ def generate_random_student():
     return ITStudent(student_name, student_id, programme, courses, marks)
 
 def producer():
+    #initializes the counter for student objects
     number_of_students=0
     while number_of_students < 10:
         try:
@@ -68,7 +69,7 @@ def producer():
             number_of_students += 1
              
         except Exception as e:
-            # LogS the error
+            # Logs the error
             logging.error(f"Exception in producer thread: {e}")  
 
         
